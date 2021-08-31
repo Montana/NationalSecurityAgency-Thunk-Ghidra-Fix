@@ -1,4 +1,4 @@
-# NSA's (National Security Agency, nsa.gov) Ghidra Thunk Function fix by Montana Mendy
+# NSA (National Security Agency) Ghidra Thunk Function fix by Montana Mendy
 
 In the image below you can see obviously there are a lot of `thunk` functions but honestly to me they just look like `printf's`. I don't know how to fix this so I can actually get readable function names, not even sure if there is a way:
 
