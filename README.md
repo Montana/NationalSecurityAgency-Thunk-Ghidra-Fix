@@ -71,3 +71,32 @@ void f(Args... args) {
 ```
 _Reason for this is, is a parameter pack may appear in the capture clause of a lambda expression._
 
+## Top down explanation
+
+The nested lambda expressions and invocations below will output 123234:
+
+```cpp
+int a = 1, b = 1, c = 1;
+auto m1 = [a, &b, &c]() mutable {
+  auto m2 = [a, b, &c]() mutable {
+    std::cout << a << b << c;
+    a = 4; b = 4; c = 4;
+  };
+  a = 3; b = 3; c = 3;
+  m2();
+};
+a = 2; b = 2; c = 2;
+m1();
+std::cout << a << b << c;
+```
+
+### Conclusion
+
+* When you capture a reference by value, you make a copy of the object that it points to.
+
+* When you capture a reference by reference, you make a reference to the object that it points to.
+
+* Here, "capturing a reference" applies equally well to capturing actual references, and to capturing reference-captures of enclosing lambdas.
+
+
+
