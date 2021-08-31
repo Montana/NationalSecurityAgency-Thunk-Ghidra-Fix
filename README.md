@@ -73,7 +73,7 @@ _Reason for this is, is a parameter pack may appear in the capture clause of a l
 
 ## Top down explanation
 
-The nested lambda expressions and invocations below will output 123234:
+The nested lambda expressions and invocations below will output `123234`:
 
 ```cpp
 int a = 1, b = 1, c = 1;
