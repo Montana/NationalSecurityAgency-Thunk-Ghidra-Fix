@@ -52,7 +52,7 @@ f(h(args...) + args...); // expands to
 ```
 _This was formally, the expression-list in a function call expression is classified as initializer-list, and the pattern is the initializer-clause, which is either an assignment-expression or a braced-init-list_. 
 
-Secondly, I quickly looked at parenthesized initializers, which seemed to work as well. This can mostly be explained via, a pack expansion may appear (more of often than not) inside the parentheses of a direct initializer, a function-style cast, and other contexts (member initializer, new-expression, etc.) in which case the rules are identical to the rules for a function call expression above, so in essence a recursive expression:
+Secondly, I quickly looked at parenthesized initializers, which seemed to work as well. This can mostly be explained via, a pack expansion may appear (more often than not) inside the parentheses of a direct initializer, a function-style cast, and other contexts (member initializer, new-expression, etc.) in which case the rules are identical to the rules for a function call expression above, so in essence a recursive expression:
 
 ```cpp
 Class c1(&args...);             // calls Class::Class(&E1, &E2, &E3)
