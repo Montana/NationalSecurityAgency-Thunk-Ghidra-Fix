@@ -130,6 +130,62 @@ int main() {
 }
 ```
 
+Expected output of running the double thunk:
+
+```bash
+__thiscall T::T(void)
+calling struct S
+__thiscall T::T(const struct T &)
+__thiscall T::T(const struct T &)
+__thiscall T::~T(void)
+__thiscall T::~T(void)
+after calling struct S
+__thiscall T::~T(void)
+```
+
+## Effect of double thunking
+
+The previous sample demonstrated the existence of double thunking. This sample shows its effect. The for loop calls the virtual function and the program reports execution time. The slowest time is reported when the program is compiled with /clr. The fastest times are reported when compiling without /clr or if the virtual function is declared with __clrcall.
+
+```cpp
+#include <time.h>
+#include <stdio.h>
+
+#pragma unmanaged
+struct T {
+   T() {}
+   T(const T&) {}
+   ~T() {}
+   T& operator=(const T&) { return *this; }
+};
+
+struct S {
+   virtual void /* __clrcall */ f(T t) {};
+} s;
+
+int main() {
+   S* pS = &s;
+   T t;
+   clock_t start, finish;
+   double  duration;
+   start = clock();
+
+   for ( int i = 0 ; i < 1000000 ; i++ )
+      pS->f(t);
+
+   finish = clock();
+   duration = (double)(finish - start) / (CLOCKS_PER_SEC);
+   printf( "%2.1f seconds\n", duration );
+   printf("after calling struct S\n");
+}
+```
+Expected output: 
+
+```bash
+4.2 seconds
+after calling struct S
+```
+
 ## Thunks with [->* x]
 
 Follows same set of callback, call stack rules.
