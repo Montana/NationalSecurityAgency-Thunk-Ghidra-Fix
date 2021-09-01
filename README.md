@@ -91,7 +91,7 @@ LRESULT CALLBACK TurnCallbackIntoMember(HWND hWnd, UINT message,
 
 Double thunking refers to the loss of performance you can experience when a function call in a managed context calls a Visual C++ managed function and where program execution calls the function's native entry point in order to call the managed function. This topic discusses where double thunking occurs and how you can avoid it to improve performance. 
 
-The following sample demonstrates double thunking. When compiled native (without /clr), the call to the virtual function in main generates one call to T's copy constructor and one call to the destructor. Similar behavior is achieved when the virtual function is declared with /clr and __clrcall. However, when just compiled with /clr, the function call generates a call to the copy constructor but there is another call to the copy constructor due to the native-to-managed thunk:
+The following sample demonstrates double thunking. When compiled native (without /clr), the call to the virtual function in `main` generates one call to T's copy constructor and one call to the destructor. Similar behavior is achieved when the virtual function is declared with /clr and __clrcall. However, when just compiled with /clr, the function call generates a call to the copy constructor but there is another call to the copy constructor due to the native-to-managed thunk:
 
 
 
