@@ -2,7 +2,9 @@
 
 ## What is a Thunk? 
 
-`Thunks` and or sometimes just called just `Thunk`, are useful in object-oriented programming platforms that allow a class to inherit multiple interfaces, leading to situations where the same method might be called via any of several interfaces, and in fact in some cases act like a subroutine. 
+`Thunks` and or sometimes just called just `Thunk` are a delayed computation,  and are useful in object-oriented programming platforms that allow a class to inherit multiple interfaces, leading to situations where the same method might be called via any of several interfaces, and in fact in some cases act like a subroutine. 
+
+Outside of that, `Thunks` usually have a runtime destructor for the exception object. `Thunks` can also catch handler calls at the end of a `Thunk`.
 
 ![image](https://user-images.githubusercontent.com/20936398/131592479-e0125a39-befe-4d37-a1b2-1bb17c81b33c.png)
 
