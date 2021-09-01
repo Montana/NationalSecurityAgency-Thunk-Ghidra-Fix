@@ -1,4 +1,4 @@
-# NSA (National Security Agency) Ghidra Thunk Function fix (for my project) - Montana Mendy
+# NSA (National Security Agency) Ghidra Thunk Function Fix (For my project) - Montana Mendy
 
 ## What is a Thunk? 
 
@@ -300,6 +300,3 @@ std::cout << a << b << c;
 * When you capture a reference by reference, you make a reference to the object that it points to.
 
 * Here, "capturing a reference" applies equally well to capturing actual references, and to capturing reference-captures of enclosing lambdas.
-
-
-
