@@ -87,6 +87,61 @@ LRESULT CALLBACK TurnCallbackIntoMember(HWND hWnd, UINT message,
 }
 ```
 
+## Double Thunking 
+
+Double thunking refers to the loss of performance you can experience when a function call in a managed context calls a Visual C++ managed function and where program execution calls the function's native entry point in order to call the managed function. This topic discusses where double thunking occurs and how you can avoid it to improve performance. 
+
+The following sample demonstrates double thunking. When compiled native (without /clr), the call to the virtual function in main generates one call to T's copy constructor and one call to the destructor. Similar behavior is achieved when the virtual function is declared with /clr and __clrcall. However, when just compiled with /clr, the function call generates a call to the copy constructor but there is another call to the copy constructor due to the native-to-managed thunk:
+
+
+
+```cpp
+#include <stdio.h>
+struct T {
+   T() {
+      puts(__FUNCSIG__);
+   }
+
+   T(const T&) {
+      puts(__FUNCSIG__);
+   }
+
+   ~T() {
+      puts(__FUNCSIG__);
+   }
+
+   T& operator=(const T&) {
+      puts(__FUNCSIG__);
+      return *this;
+   }
+};
+
+struct S {
+   virtual void /* __clrcall */ f(T t) {};
+} s;
+
+int main() {
+   S* pS = &s;
+   T t;
+
+   printf("calling struct S\n");
+   pS->f(t);
+   printf("after calling struct S\n");
+}
+```
+
+## Thunks with [->* x]
+
+Follows same set of callback, call stack rules.
+
+<img width="697" alt="Screen Shot 2021-08-31 at 5 54 17 PM" src="https://user-images.githubusercontent.com/20936398/131594556-9cb2ad6f-6408-4320-b8fb-e8924083fad5.png">
+
+```cpp
+(build-list 10 [->* (random 100)])
+'(85 65 20 40 89 45 54 38 26 62)
+```
+Down below will explain in a visual form: 
+
 ![image](https://user-images.githubusercontent.com/20936398/131592768-17ed9a24-9ded-4785-add0-de6e618e8bb4.png)
 
 ## Ghidra
