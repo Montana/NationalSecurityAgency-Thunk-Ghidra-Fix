@@ -1,5 +1,94 @@
 # NSA (National Security Agency) Ghidra Thunk Function fix (for my project) - Montana Mendy
 
+## What is a Thunk? 
+
+`Thunks` and or sometimes just called just `Thunk`, are useful in object-oriented programming platforms that allow a class to inherit multiple interfaces, leading to situations where the same method might be called via any of several interfaces, and in fact in some cases act like a subroutine. 
+
+![image](https://user-images.githubusercontent.com/20936398/131592479-e0125a39-befe-4d37-a1b2-1bb17c81b33c.png)
+
+So let me show you a quick working example of a `Thunk`, and I'll break it down for you: 
+
+* The library calls the Thunk.
+* The Thunk adds a `this` pointer to the call stack.
+* The Thunk forwards the call to the actual callback.
+* The callback fetches the `this` pointer from the call stack and calls member functions using the this pointer.
+
+As step one follows: 
+
+```cpp
+LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    // …
+    // Use the address of the thunk as the address of the callback, so that
+    // whenever the library calls the callback, it ends up calling the thunk.
+    WNDPROC pProc = (WNDPROC)pThis->m_pThunk;
+    ::SetWindowLong(hWnd, GWL_WNDPROC, (LONG)pProc);
+    // …
+}
+```
+
+Now logically, we are going to go on to step 2: 
+
+```cpp
+LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    CWindowWithThunk* pThis = (CWindowWithThunk*)g_ModuleData.ExtractWindowObj();
+    // …
+    pThis->m_pThunk->Init((DWORD)TurnCallbackIntoMember, pThis);
+    // …
+}
+
+void _stdcallthunk::Init(DWORD proc, void* pThis)
+{
+    // 0x042444C7 is the same as "mov dword ptr[esp+0x4]," on the x86 platform,
+    // so the following statements are the same as "mov dword ptr [esp+0x4], pThis"
+    // where [esp+0x4] is the hWnd argument that is pushed onto the call stack 
+    // by the Windows. Here the this pointer overwrites the hWnd, but there is no harm 
+    // because the hWnd has already been saved to the object to which the this 
+    // pointer refers to. See figure 1.
+
+    m_mov = 0x042444C7;  //C7 44 24 0C
+    m_this = PtrToUlong(pThis);
+    // …
+}
+```
+
+Now let's hit step 3:
+
+```cpp
+LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    // …
+    pThis->m_pThunk->Init((DWORD)TurnCallbackIntoMember, pThis);
+    // …
+}
+
+void _stdcallthunk::Init(DWORD_PTR proc, void* pThis)
+{
+    // After the this pointer has been added to the call stack, now jump to the 
+    // actual callback (in this case, TurnCallbackIntoMember)
+    m_jmp = 0xe9;
+    m_relproc = DWORD((INT_PTR)proc - ((INT_PTR)this+sizeof(_stdcallthunk)));
+}
+```
+
+Finally to show off the Thunk in it's entirerty: 
+
+```cpp
+LRESULT CALLBACK TurnCallbackIntoMember(HWND hWnd, UINT message, 
+                 WPARAM wParam, LPARAM lParam)
+{
+    // Now fetch the this pointer from the call stack
+    CWindowWithThunk* pThis = (CWindowWithThunk*)hWnd;
+    // and call member functions using the this pointer
+    pThis->OnPaint();
+}
+```
+
+![image](https://user-images.githubusercontent.com/20936398/131592768-17ed9a24-9ded-4785-add0-de6e618e8bb4.png)
+
+## Ghidra
+
 In the image below you can see obviously there are a lot of `thunk` functions but honestly to me they just look like `printf's`. I don't know how to fix this so I can actually get readable function names, not even sure if there is a way:
 
 <img width="437" alt="Screen Shot 2021-08-31 at 5 33 00 AM" src="https://user-images.githubusercontent.com/20936398/131503326-15190cdc-e597-40c1-a942-0b889551f60a.png">
