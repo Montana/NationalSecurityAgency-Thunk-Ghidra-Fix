@@ -145,7 +145,7 @@ __thiscall T::~T(void)
 
 ## Effect of double thunking
 
-The previous sample demonstrated the existence of double thunking. This sample shows its effect. The for loop calls the virtual function and the program reports execution time. The slowest time is reported when the program is compiled with /clr. The fastest times are reported when compiling without /clr or if the virtual function is declared with __clrcall.
+The previous sample demonstrated the existence of double thunking. This sample shows its effect. The `for loop` calls the virtual function and the program reports execution time. The slowest time is reported when the program is compiled with /clr. The fastest times are reported when compiling without /clr or if the virtual function is declared with `__clrcall`.
 
 ```cpp
 #include <time.h>
@@ -185,6 +185,7 @@ Expected output:
 4.2 seconds
 after calling struct S
 ```
+I recommend using a mixed-mode C++ libraries effeciently to avoid performance hits like that of having to use a `double thunk`. 
 
 ## Thunks with [->* x]
 
